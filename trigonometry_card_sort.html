@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trigonometry Card Sort</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        #instructions {
+            margin-bottom: 20px;
+        }
+        .term-container, .definition-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .term {
+            padding: 10px 15px;
+            background-color: #e0f7fa;
+            border: 1px solid #00796b;
+            border-radius: 5px;
+            cursor: grab;
+        }
+        .definition {
+            width: 300px;
+            min-height: 60px;
+            padding: 10px;
+            background-color: #f9fbe7;
+            border: 2px dashed #c0ca33;
+            border-radius: 5px;
+            position: relative;
+        }
+        .definition p {
+            margin: 0;
+        }
+        .button-container {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>Trigonometry Card Sort</h2>
+    <div id="instructions">
+        Drag each trigonometry term to its correct definition. Click "Scramble Terms" to randomize the order. Click "Check Score" to see how many matches are correct.
+    </div>
+    <div class="button-container">
+        <button onclick="scrambleTerms()">Scramble Terms</button>
+        <button onclick="checkScore()">Check Score</button>
+    </div>
+    <div id="termContainer" class="term-container"></div>
+    <div id="definitionContainer" class="definition-container"></div>
+    <div id="scoreDisplay"></div>
+
+    <script>
+        const terms = [
+            { term: "Sine", definition: "Ratio of opposite side to hypotenuse in a right triangle." },
+            { term: "Cosine", definition: "Ratio of adjacent side to hypotenuse in a right triangle." },
+            { term: "Tangent", definition: "Ratio of opposite side to adjacent side in a right triangle." },
+            { term: "Hypotenuse", definition: "The longest side of a right triangle, opposite the right angle." },
+            { term: "Opposite Side", definition: "The side opposite the angle in question in a triangle." },
+            { term: "Adjacent Side", definition: "The side next to the angle in question in a triangle." },
+            { term: "Right Angle", definition: "An angle of 90 degrees." },
+            { term: "Pythagoras' Theorem", definition: "In a right triangle, a² + b² = c², where c is the hypotenuse." },
+            { term: "Angle", definition: "Formed by two rays with a common endpoint." },
+            { term: "Triangle", definition: "A polygon with three edges and three vertices." },
+            { term: "Trigonometry", definition: "The branch of mathematics dealing with relationships between angles and sides of triangles." },
+            { term: "Unit Circle", definition: "A circle with radius 1 centered at the origin, used in trigonometry." }
+        ];
+
+        function createCards() {
+            const termContainer = document.getElementById("termContainer");
+            const definitionContainer = document.getElementById("definitionContainer");
+            termContainer.innerHTML = "";
+            definitionContainer.innerHTML = "";
+
+            const shuffledTerms = [...terms].sort(() => Math.random() - 0.5);
+
+            shuffledTerms.forEach((item, index) => {
+                const termDiv = document.createElement("div");
+                termDiv.className = "term";
+                termDiv.draggable = true;
+                termDiv.id = "term-" + index;
+                termDiv.textContent = item.term;
+                termDiv.dataset.term = item.term;
+                termDiv.addEventListener("dragstart", dragStart);
+                termContainer.appendChild(termDiv);
+            });
+
+            terms.forEach((item, index) => {
+                const defDiv = document.createElement("div");
+                defDiv.className = "definition";
+                defDiv.id = "def-" + index;
+                defDiv.dataset.term = item.term;
+                defDiv.addEventListener("dragover", dragOver);
+                defDiv.addEventListener("drop", drop);
+                const defText = document.createElement("p");
+                defText.textContent = item.definition;
+                defDiv.appendChild(defText);
+                definitionContainer.appendChild(defDiv);
+            });
+        }
+
+        function dragStart(e) {
+            e.dataTransfer.setData("text/plain", e.target.id);
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            const termId = e.dataTransfer.getData("text/plain");
+            const termElement = document.getElementById(termId);
+            if (termElement && !e.target.querySelector(".term")) {
+                e.target.appendChild(termElement);
+            }
+        }
+
+        function scrambleTerms() {
+            createCards();
+            document.getElementById("scoreDisplay").textContent = "";
+        }
+
+        function checkScore() {
+            let score = 0;
+            terms.forEach((item, index) => {
+                const defDiv = document.getElementById("def-" + index);
+                const termElement = defDiv.querySelector(".term");
+                if (termElement && termElement.dataset.term === item.term) {
+                    score++;
+                }
+            });
+            document.getElementById("scoreDisplay").textContent = "Score: " + score + " out of " + terms.length;
+        }
+
+        window.onload = createCards;
+    </script>
+</body>
+</html>
