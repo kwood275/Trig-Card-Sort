@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trigonometry Card Sort</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    #instructions {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .card {
+      padding: 10px;
+      background-color: #f0f8ff;
+      border: 1px solid #ccc;
+      cursor: move;
+      width: 150px;
+      text-align: center;
+    }
+    .dropzone {
+      padding: 10px;
+      background-color: #fff8dc;
+      border: 2px dashed #aaa;
+      width: 300px;
+      min-height: 50px;
+      text-align: center;
+    }
+    .matched {
+      border: 2px solid green;
+    }
+    #score {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    button {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Trigonometry Card Sort</h2>
+<div id="instructions">
+  Drag each term to its correct definition. Click "Scramble" to randomize the terms. When finished, click "Check Answers" to see your score.
+</div>
+
+<div class="container" id="terms"></div>
+<hr>
+<div class="container" id="definitions"></div>
+
+<div id="score"></div>
+<button onclick="scrambleTerms()">Scramble</button>
+<button onclick="checkAnswers()">Check Answers</button>
+
+<script>
+  const terms = [
+    "Sine",
+    "Cosine",
+    "Tangent",
+    "Hypotenuse",
+    "Opposite Side",
+    "Adjacent Side",
+    "Right Triangle",
+    "Angle",
+    "Pythagoras' Theorem",
+    "SOH",
+    "CAH",
+    "TOA"
+  ];
+
+  const definitions = {
+    "Sine": "Ratio of opposite side to hypotenuse in a right triangle.",
+    "Cosine": "Ratio of adjacent side to hypotenuse in a right triangle.",
+    "Tangent": "Ratio of opposite side to adjacent side in a right triangle.",
+    "Hypotenuse": "The longest side of a right triangle, opposite the right angle.",
+    "Opposite Side": "The side opposite to the angle in question.",
+    "Adjacent Side": "The side next to the angle in question, excluding the hypotenuse.",
+    "Right Triangle": "A triangle with one angle measuring 90 degrees.",
+    "Angle": "Formed by two rays with a common endpoint.",
+    "Pythagoras' Theorem": "In a right triangle, a² + b² = c².",
+    "SOH": "Mnemonic for Sine = Opposite / Hypotenuse.",
+    "CAH": "Mnemonic for Cosine = Adjacent / Hypotenuse.",
+    "TOA": "Mnemonic for Tangent = Opposite / Adjacent."
+  };
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  function createCards() {
+    const termContainer = document.getElementById("terms");
+    termContainer.innerHTML = "";
+    const shuffledTerms = [...terms];
+    shuffle(shuffledTerms);
+    shuffledTerms.forEach(term => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.draggable = true;
+      card.textContent = term;
+      card.id = term;
+      card.addEventListener("dragstart", dragStart);
+      termContainer.appendChild(card);
+    });
+  }
+
+  function createDropzones() {
+    const defContainer = document.getElementById("definitions");
+    defContainer.innerHTML = "";
+    Object.entries(definitions).forEach(([term, def]) => {
+      const zone = document.createElement("div");
+      zone.className = "dropzone";
+      zone.dataset.term = term;
+      zone.textContent = def;
+      zone.addEventListener("dragover", dragOver);
+      zone.addEventListener("drop", drop);
+      defContainer.appendChild(zone);
+    });
+  }
+
+  function dragStart(e) {
+    e.dataTransfer.setData("text/plain", e.target.id);
+  }
+
+  function dragOver(e) {
+    e.preventDefault();
+  }
+
+  function drop(e) {
+    e.preventDefault();
+    const termId = e.dataTransfer.getData("text/plain");
+    const draggedCard = document.getElementById(termId);
+    e.target.innerHTML = "";
+    e.target.appendChild(draggedCard);
+  }
+
+  function checkAnswers() {
+    let score = 0;
+    const zones = document.querySelectorAll(".dropzone");
+    zones.forEach(zone => {
+      const expected = zone.dataset.term;
+      const card = zone.querySelector(".card");
+      if (card && card.id === expected) {
+        score++;
+        zone.classList.add("matched");
+      } else {
+        zone.classList.remove("matched");
+      }
+    });
+    document.getElementById("score").textContent = `Score: ${score} / ${terms.length}`;
+  }
+
+  function scrambleTerms() {
+    createCards();
+    document.getElementById("score").textContent = "";
+    const zones = document.querySelectorAll(".dropzone");
+    zones.forEach(zone => {
+      zone.classList.remove("matched");
+      zone.innerHTML = definitions[zone.dataset.term];
+    });
+  }
+
+  createCards();
+  createDropzones();
+</script>
+
+</body>
+</html>
