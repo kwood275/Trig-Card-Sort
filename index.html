@@ -1,102 +1,149 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Trigonometry Card Sort</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h1 { text-align: center; }
-        .container { display: flex; flex-wrap: wrap; justify-content: space-around; }
-        .card, .dropzone {
-            width: 200px; min-height: 50px; margin: 10px; padding: 10px;
-            border: 2px dashed #ccc; border-radius: 8px; background-color: #f9f9f9;
-            text-align: center; cursor: move;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
         }
-        .dropzone { background-color: #e0f7fa; }
-        #score { font-size: 18px; margin-top: 20px; text-align: center; }
-        button { display: block; margin: 20px auto; padding: 10px 20px; font-size: 16px; }
+        h2 {
+            color: #333;
+        }
+        #instructions {
+            margin-bottom: 20px;
+        }
+        .term-container, .definition-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .term {
+            padding: 10px 15px;
+            background-color: #e0f7fa;
+            border: 1px solid #00796b;
+            border-radius: 5px;
+            cursor: grab;
+        }
+        .definition {
+            width: 300px;
+            min-height: 60px;
+            padding: 10px;
+            background-color: #f9fbe7;
+            border: 2px dashed #c0ca33;
+            border-radius: 5px;
+            position: relative;
+        }
+        .definition p {
+            margin: 0;
+        }
+        .button-container {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <h1>Trigonometry Card Sort</h1>
-    <button onclick="shuffleCards()">🔀 Scramble Cards</button>
-    <div class="container" id="terms"></div>
-    <div class="container" id="definitions"></div>
-    <div id="score">Score: 0</div>
+    <h2>Trigonometry Card Sort</h2>
+    <div id="instructions">
+        Drag each trigonometry term to its correct definition. Click "Scramble Terms" to randomize the order. Click "Check Score" to see how many matches are correct.
+    </div>
+    <div class="button-container">
+        <button onclick="scrambleTerms()">Scramble Terms</button>
+        <button onclick="checkScore()">Check Score</button>
+    </div>
+    <div id="termContainer" class="term-container"></div>
+    <div id="definitionContainer" class="definition-container"></div>
+    <div id="scoreDisplay"></div>
 
     <script>
-        const pairs = [
+        const terms = [
             { term: "Sine", definition: "Ratio of opposite side to hypotenuse in a right triangle." },
             { term: "Cosine", definition: "Ratio of adjacent side to hypotenuse in a right triangle." },
             { term: "Tangent", definition: "Ratio of opposite side to adjacent side in a right triangle." },
             { term: "Hypotenuse", definition: "The longest side of a right triangle, opposite the right angle." },
-            { term: "Adjacent", definition: "The side next to the angle in question in a right triangle." },
-            { term: "Opposite", definition: "The side opposite the angle in question in a right triangle." },
-            { term: "Pythagoras' Theorem", definition: "In a right triangle: a² + b² = c², where c is the hypotenuse." },
+            { term: "Opposite Side", definition: "The side opposite the angle in question in a triangle." },
+            { term: "Adjacent Side", definition: "The side next to the angle in question in a triangle." },
             { term: "Right Angle", definition: "An angle of 90 degrees." },
+            { term: "Pythagoras' Theorem", definition: "In a right triangle, a² + b² = c², where c is the hypotenuse." },
             { term: "Angle", definition: "Formed by two rays with a common endpoint." },
-            { term: "Trigonometry", definition: "Branch of mathematics dealing with relationships between angles and sides of triangles." },
-            { term: "SOHCAHTOA", definition: "Mnemonic for remembering sine, cosine, and tangent ratios." },
-            { term: "Unit Circle", definition: "A circle with radius 1 centered at the origin, used to define trigonometric functions." }
+            { term: "Triangle", definition: "A polygon with three edges and three vertices." },
+            { term: "Trigonometry", definition: "The branch of mathematics dealing with relationships between angles and sides of triangles." },
+            { term: "Unit Circle", definition: "A circle with radius 1 centered at the origin, used in trigonometry." }
         ];
 
-        let score = 0;
-
         function createCards() {
-            const termsContainer = document.getElementById("terms");
-            const definitionsContainer = document.getElementById("definitions");
-            termsContainer.innerHTML = "";
-            definitionsContainer.innerHTML = "";
+            const termContainer = document.getElementById("termContainer");
+            const definitionContainer = document.getElementById("definitionContainer");
+            termContainer.innerHTML = "";
+            definitionContainer.innerHTML = "";
 
-            pairs.forEach((pair, index) => {
-                const termCard = document.createElement("div");
-                termCard.className = "card";
-                termCard.draggable = true;
-                termCard.id = "term-" + index;
-                termCard.textContent = pair.term;
-                termCard.addEventListener("dragstart", dragStart);
-                termsContainer.appendChild(termCard);
+            const shuffledTerms = [...terms].sort(() => Math.random() - 0.5);
 
-                const dropzone = document.createElement("div");
-                dropzone.className = "dropzone";
-                dropzone.dataset.match = "term-" + index;
-                dropzone.textContent = pair.definition;
-                dropzone.addEventListener("dragover", dragOver);
-                dropzone.addEventListener("drop", drop);
-                definitionsContainer.appendChild(dropzone);
+            shuffledTerms.forEach((item, index) => {
+                const termDiv = document.createElement("div");
+                termDiv.className = "term";
+                termDiv.draggable = true;
+                termDiv.id = "term-" + index;
+                termDiv.textContent = item.term;
+                termDiv.dataset.term = item.term;
+                termDiv.addEventListener("dragstart", dragStart);
+                termContainer.appendChild(termDiv);
+            });
+
+            terms.forEach((item, index) => {
+                const defDiv = document.createElement("div");
+                defDiv.className = "definition";
+                defDiv.id = "def-" + index;
+                defDiv.dataset.term = item.term;
+                defDiv.addEventListener("dragover", dragOver);
+                defDiv.addEventListener("drop", drop);
+                const defText = document.createElement("p");
+                defText.textContent = item.definition;
+                defDiv.appendChild(defText);
+                definitionContainer.appendChild(defDiv);
             });
         }
 
-        function dragStart(event) {
-            event.dataTransfer.setData("text/plain", event.target.id);
+        function dragStart(e) {
+            e.dataTransfer.setData("text/plain", e.target.id);
         }
 
-        function dragOver(event) {
-            event.preventDefault();
+        function dragOver(e) {
+            e.preventDefault();
         }
 
-        function drop(event) {
-            event.preventDefault();
-            const draggedId = event.dataTransfer.getData("text/plain");
-            const dropzone = event.target;
-
-            if (dropzone.dataset.match === draggedId) {
-                dropzone.style.backgroundColor = "#c8e6c9";
-                dropzone.textContent += " ✅";
-                document.getElementById(draggedId).style.display = "none";
-                score++;
-                document.getElementById("score").textContent = "Score: " + score;
-            } else {
-                dropzone.style.backgroundColor = "#ffcdd2";
-                dropzone.textContent += " ❌";
+        function drop(e) {
+            e.preventDefault();
+            const termId = e.dataTransfer.getData("text/plain");
+            const termElement = document.getElementById(termId);
+            if (termElement && !e.target.querySelector(".term")) {
+                e.target.appendChild(termElement);
             }
         }
 
-        function shuffleCards() {
-            pairs.sort(() => Math.random() - 0.5);
-            score = 0;
-            document.getElementById("score").textContent = "Score: 0";
+        function scrambleTerms() {
             createCards();
+            document.getElementById("scoreDisplay").textContent = "";
+        }
+
+        function checkScore() {
+            let score = 0;
+            terms.forEach((item, index) => {
+                const defDiv = document.getElementById("def-" + index);
+                const termElement = defDiv.querySelector(".term");
+                if (termElement && termElement.dataset.term === item.term) {
+                    score++;
+                }
+            });
+            document.getElementById("scoreDisplay").textContent = "Score: " + score + " out of " + terms.length;
         }
 
         window.onload = createCards;
