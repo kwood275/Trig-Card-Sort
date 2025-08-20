@@ -2,151 +2,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Trigonometry Card Sort</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        h2 {
-            color: #333;
-        }
-        #instructions {
-            margin-bottom: 20px;
-        }
-        .term-container, .definition-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .term {
-            padding: 10px 15px;
-            background-color: #e0f7fa;
-            border: 1px solid #00796b;
-            border-radius: 5px;
-            cursor: grab;
-        }
-        .definition {
-            width: 300px;
-            min-height: 60px;
-            padding: 10px;
-            background-color: #f9fbe7;
-            border: 2px dashed #c0ca33;
-            border-radius: 5px;
-            position: relative;
-        }
-        .definition p {
-            margin: 0;
-        }
-        .button-container {
-            margin-bottom: 20px;
-        }
-        button {
-            padding: 10px 15px;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Trig and Pythagoras Card Sort</title>
+<style>
+  body { font-family: Arial; background: #f0f8ff; padding: 20px; }
+  .container { display: flex; flex-wrap: wrap; justify-content: center; }
+  .dropzone { width: 30%; min-height: 300px; border: 2px dashed #ccc; border-radius: 10px; padding: 10px; margin: 10px; background: #fff; }
+  .dropzone h3 { text-align: center; }
+  .card { width: 200px; margin: 10px; padding: 10px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; font-weight: bold; cursor: move; background: #add8e6; }
+  .solution { background: #ffd700; }
+  img { max-width: 100%; height: auto; }
+</style>
 </head>
 <body>
-    <h2>Trigonometry Card Sort</h2>
-    <div id="instructions">
-        Drag each trigonometry term to its correct definition. Click "Scramble Terms" to randomize the order. Click "Check Score" to see how many matches are correct.
-    </div>
-    <div class="button-container">
-        <button onclick="scrambleTerms()">Scramble Terms</button>
-        <button onclick="checkScore()">Check Score</button>
-    </div>
-    <div id="termContainer" class="term-container"></div>
-    <div id="definitionContainer" class="definition-container"></div>
-    <div id="scoreDisplay"></div>
-
-    <script>
-        const terms = [
-            { term: "Sine", definition: "Ratio of opposite side to hypotenuse in a right triangle." },
-            { term: "Cosine", definition: "Ratio of adjacent side to hypotenuse in a right triangle." },
-            { term: "Tangent", definition: "Ratio of opposite side to adjacent side in a right triangle." },
-            { term: "Hypotenuse", definition: "The longest side of a right triangle, opposite the right angle." },
-            { term: "Opposite Side", definition: "The side opposite the angle in question in a triangle." },
-            { term: "Adjacent Side", definition: "The side next to the angle in question in a triangle." },
-            { term: "Right Angle", definition: "An angle of 90 degrees." },
-            { term: "Pythagoras' Theorem", definition: "In a right triangle, a² + b² = c², where c is the hypotenuse." },
-            { term: "Angle", definition: "Formed by two rays with a common endpoint." },
-            { term: "Triangle", definition: "A polygon with three edges and three vertices." },
-            { term: "Trigonometry", definition: "The branch of mathematics dealing with relationships between angles and sides of triangles." },
-            { term: "Unit Circle", definition: "A circle with radius 1 centered at the origin, used in trigonometry." }
-        ];
-
-        function createCards() {
-            const termContainer = document.getElementById("termContainer");
-            const definitionContainer = document.getElementById("definitionContainer");
-            termContainer.innerHTML = "";
-            definitionContainer.innerHTML = "";
-
-            const shuffledTerms = [...terms].sort(() => Math.random() - 0.5);
-
-            shuffledTerms.forEach((item, index) => {
-                const termDiv = document.createElement("div");
-                termDiv.className = "term";
-                termDiv.draggable = true;
-                termDiv.id = "term-" + index;
-                termDiv.textContent = item.term;
-                termDiv.dataset.term = item.term;
-                termDiv.addEventListener("dragstart", dragStart);
-                termContainer.appendChild(termDiv);
-            });
-
-            terms.forEach((item, index) => {
-                const defDiv = document.createElement("div");
-                defDiv.className = "definition";
-                defDiv.id = "def-" + index;
-                defDiv.dataset.term = item.term;
-                defDiv.addEventListener("dragover", dragOver);
-                defDiv.addEventListener("drop", drop);
-                const defText = document.createElement("p");
-                defText.textContent = item.definition;
-                defDiv.appendChild(defText);
-                definitionContainer.appendChild(defDiv);
-            });
-        }
-
-        function dragStart(e) {
-            e.dataTransfer.setData("text/plain", e.target.id);
-        }
-
-        function dragOver(e) {
-            e.preventDefault();
-        }
-
-        function drop(e) {
-            e.preventDefault();
-            const termId = e.dataTransfer.getData("text/plain");
-            const termElement = document.getElementById(termId);
-            if (termElement && !e.target.querySelector(".term")) {
-                e.target.appendChild(termElement);
-            }
-        }
-
-        function scrambleTerms() {
-            createCards();
-            document.getElementById("scoreDisplay").textContent = "";
-        }
-
-        function checkScore() {
-            let score = 0;
-            terms.forEach((item, index) => {
-                const defDiv = document.getElementById("def-" + index);
-                const termElement = defDiv.querySelector(".term");
-                if (termElement && termElement.dataset.term === item.term) {
-                    score++;
-                }
-            });
-            document.getElementById("scoreDisplay").textContent = "Score: " + score + " out of " + terms.length;
-        }
-
-        window.onload = createCards;
-    </script>
+<h1>Trig and Pythagoras Card Sort</h1>
+<div class="container" id="card-pool">
+<div class="card" draggable="true" ondragstart="drag(event)"><img src="images/triangle_1.png" alt="Triangle 1"><p>Q1</p></div><div class="card" draggable="true" ondragstart="drag(event)"><img src="images/triangle_2.png" alt="Triangle 2"><p>Q2</p></div><div class="card" draggable="true" ondragstart="drag(event)"><img src="images/triangle_3.png" alt="Triangle 3"><p>Q3</p></div><div class="card" draggable="true" ondragstart="drag(event)"><img src="images/triangle_4.png" alt="Triangle 4"><p>Q4</p></div><div class="card" draggable="true" ondragstart="drag(event)"><img src="images/triangle_5.png" alt="Triangle 5"><p>Q5</p></div><div class="card" draggable="true" ondragstart="drag(event)"><img src="images/triangle_6.png" alt="Triangle 6"><p>Q6</p></div><div class="card" draggable="true" ondragstart="drag(event)"><img src="images/triangle_7.png" alt="Triangle 7"><p>Q7</p></div><div class="card" draggable="true" ondragstart="drag(event)"><img src="images/triangle_8.png" alt="Triangle 8"><p>Q8</p></div><div class="card" draggable="true" ondragstart="drag(event)"><img src="images/triangle_9.png" alt="Triangle 9"><p>Q9</p></div><div class="card" draggable="true" ondragstart="drag(event)"><img src="images/triangle_10.png" alt="Triangle 10"><p>Q10</p></div><div class="card solution" draggable="true" ondragstart="drag(event)">c = 5</div><div class="card solution" draggable="true" ondragstart="drag(event)">a = 12</div><div class="card solution" draggable="true" ondragstart="drag(event)">b = 8</div><div class="card solution" draggable="true" ondragstart="drag(event)">x = 5</div><div class="card solution" draggable="true" ondragstart="drag(event)">x = 4</div><div class="card solution" draggable="true" ondragstart="drag(event)">x = 5</div><div class="card solution" draggable="true" ondragstart="drag(event)">x ≈ 9.9</div><div class="card solution" draggable="true" ondragstart="drag(event)">A = 30°</div><div class="card solution" draggable="true" ondragstart="drag(event)">B ≈ 53.1°</div><div class="card solution" draggable="true" ondragstart="drag(event)">C ≈ 60°</div>
+</div>
+<div class="container">
+  <div class="dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"><h3>Match Questions to Solutions</h3></div>
+</div>
+<script>
+function allowDrop(ev) { ev.preventDefault(); }
+function drag(ev) { ev.dataTransfer.setData("text", ev.target.outerHTML); ev.target.remove(); }
+function drop(ev) { ev.preventDefault(); const data = ev.dataTransfer.getData("text"); ev.target.closest(".dropzone").insertAdjacentHTML("beforeend", data); }
+</script>
 </body>
 </html>
